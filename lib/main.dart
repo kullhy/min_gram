@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,10 @@ import 'services/locator.dart';
 import 'services/telegram_service.dart';
 import 'utils/const.dart';
 
+
+BuildContext? mainContext;
 void main() async {
+  FlutterBackgroundService().invoke('setAsForeground');
    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   flutterLocalNotificationsPlugin

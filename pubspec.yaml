@@ -41,9 +41,11 @@ dependencies:
   country_pickers: ^2.0.0
   get_it: ^6.1.1
   pretty_qr_code: ^2.0.3
-  flutter_background_service: ^0.2.6
+  # flutter_background_service: ^0.2.6
   flutter_local_notifications: ^12.0.4
   sqflite: ^2.0.2+1
+  flutter_background_service: ^2.4.6
+  flutter_background_service_android: ^3.0.3
  
 
 
