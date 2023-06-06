@@ -3,9 +3,25 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tdlib/td_api.dart' as td hide Tex;
+import 'package:tdlib/td_api.dart' as td hide Text;
 
 import '../services/telegram_service.dart';
+
+void getUpdate(BuildContext context, int chatId) async {
+  final telegramService = Provider.of<TelegramService>(context, listen: true);
+  void setupTelegramService() {
+    telegramService.updateStream.listen((update) {
+      // Xử lý cập nhật, kiểm tra có tin nhắn mới hay không
+      if (update is td.UpdateNewMessage) {
+        final message = update.message;
+        // Xử lý tin nhắn mới
+        print('New Message: ${message.content}');
+      } else {
+        print("k dc dau be ơi");
+      }
+    });
+  }
+}
 
 //Lấy lịch sử chat
 Future<List<td.Message>> getChatHistory(
@@ -59,6 +75,8 @@ class _ChatScreensState extends State<ChatScreens> {
     while (true) {
       //Tạo vòng lặp vô hạn để cập nhật liên tục
       final messages = await getChatHistory(context, widget.chatId);
+      print("tin nhắn ${jsonEncode(messages)}");
+      getUpdate(context, widget.chatId);
       _messageStreamController
           .add(messages); // Gửi dữ liệu tin nhắn mới đến luồng (stream)
       await Future.delayed(
@@ -160,7 +178,7 @@ class _ChatScreensState extends State<ChatScreens> {
                                 color: isOutgoing ? Colors.blue : Colors.grey,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Text(messageTxt ?? ''),
+                              child: Text(messageTxt),
                             ),
                           ),
                         ],

@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:tdlib/td_client.dart';
 
@@ -9,6 +11,18 @@ import 'services/telegram_service.dart';
 import 'utils/const.dart';
 
 void main() async {
+   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.requestPermission();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Permission.notification.isDenied.then(
+    (value) {
+      Permission.notification.request();
+    },
+  );
   //SystemChrome.setSystemUIOverlayStyle(SystemUiOverlay.);
   WidgetsFlutterBinding.ensureInitialized();
   Provider.debugCheckInvalidValueType = null;

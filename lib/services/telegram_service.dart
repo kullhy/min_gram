@@ -19,6 +19,8 @@ class TelegramService extends ChangeNotifier {
   late int _client;
   late StreamController<TdObject> _eventController;
   late StreamSubscription<TdObject> _eventReceiver;
+   StreamController<Update> _updateController = StreamController<Update>.broadcast();
+  Stream<Update> get updateStream => _updateController.stream;
   Map results = <int, Completer>{};
   Map callbackResults = <int, Future<void>>{};
   late Directory appDocDir;
