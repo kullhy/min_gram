@@ -13,22 +13,20 @@ Future<void> saveUserToDatabase(List<Contact> contacts) async {
     x = x + 1;
     print("test mes ${x} ${jsonEncode(contacts[i])}");
     final contact = contacts[i];
-    if (contact != null) {
-      final contactRow = {
-        'id': contact.userId,
-        'first_name': contact.firstName,
-        'last_name': contact.lastName
-      };
+    final contactRow = {
+      'id': contact.userId,
+      'first_name': contact.firstName,
+      'last_name': contact.lastName
+    };
 
-      try {
-        // Chuyển phần thao tác cập nhật vào một luồng khác
-        await Future.delayed(Duration.zero, () async {
-          final contactId = await database.insert('message', contactRow);
-          print('contact with ID $contactId saved successfully.');
-        });
-      } catch (e) {
-        print('Failed to save contact: $e');
-      }
+    try {
+      // Chuyển phần thao tác cập nhật vào một luồng khác
+      await Future.delayed(Duration.zero, () async {
+        final contactId = await database.insert('message', contactRow);
+        print('contact with ID $contactId saved successfully.');
+      });
+    } catch (e) {
+      print('Failed to save contact: $e');
     }
   }
 }
@@ -49,24 +47,22 @@ Future<void> saveLastMassage(List<Message> lastMessages) async {
       FormattedText text = messageText.text;
       messageTxt = text.text;
     }
-    if (message != null) {
-      final messageRow = {
-        'id': message.chatId,
-        'user_id': message.id,
-        'text': messageTxt,
-        'date_time': message.date,
-        'is_sent': 1,
-      };
+    final messageRow = {
+      'id': message.chatId,
+      'user_id': message.id,
+      'text': messageTxt,
+      'date_time': message.date,
+      'is_sent': 1,
+    };
 
-      try {
-        // Chuyển phần thao tác cập nhật vào một luồng khác
-        await Future.delayed(Duration.zero, () async {
-          final messageId = await database.insert('message', messageRow);
-          print('Message with ID $messageId saved successfully.');
-        });
-      } catch (e) {
-        print('Failed to save message: $e');
-      }
+    try {
+      // Chuyển phần thao tác cập nhật vào một luồng khác
+      await Future.delayed(Duration.zero, () async {
+        final messageId = await database.insert('message', messageRow);
+        print('Message with ID $messageId saved successfully.');
+      });
+    } catch (e) {
+      print('Failed to save message: $e');
     }
   }
 }

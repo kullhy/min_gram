@@ -141,7 +141,7 @@ class _ChatScreensState extends State<ChatScreens> {
                 } else {
                   var messages = snapshot.data ?? [];
                   messages = messages.reversed.toList();
-                  WidgetsBinding.instance?.addPostFrameCallback((_) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
                     _scrollController.animateTo(
                       _scrollController.position.maxScrollExtent,
                       duration: const Duration(milliseconds: 300),
