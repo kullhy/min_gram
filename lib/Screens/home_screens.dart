@@ -2,10 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:min_gram/Screens/chat_screens.dart';
 import 'package:provider/provider.dart';
 import 'package:tdlib/td_api.dart' hide Text;
 
+import '../main.dart';
 import '../services/telegram_service.dart';
 
 //get Contacts
@@ -45,6 +48,29 @@ class _HomeScreensState extends State<HomeScreens> {
     // TODO: implement initState
     super.initState();
     listContact();
+    FlutterBackgroundService().invoke('setAsForeground');
+    mainContext = context;
+
+    FlutterLocalNotificationsPlugin()
+        .getNotificationAppLaunchDetails()
+        .then((notificationAppLaunchDetails) {
+      final payload =
+          notificationAppLaunchDetails?.notificationResponse?.payload;
+      print("check payload $payload");
+      if (payload != null) {
+        // Xử lý payload (userId) ở đây
+        final userId = payload;
+        // Điều hướng đến màn hình DetailScreen với userId tương ứng
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatScreens(
+              chatId: int.parse(payload),
+            ),
+          ),
+        );
+      }
+    });
   }
 
   void listContact() async {
@@ -133,8 +159,12 @@ class _HomeScreensState extends State<HomeScreens> {
             final user = users[index];
             return InkWell(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ChatScreens(chatId: user.id,)));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChatScreens(
+                              chatId: user.id,
+                            )));
               },
               child: ListTile(
                 title: Text(user.firstName ?? 'k co'),

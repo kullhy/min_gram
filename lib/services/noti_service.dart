@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:min_gram/Screens/chat_screens.dart';
+import 'package:min_gram/Screens/home_screens.dart';
+import 'package:min_gram/database/savetodb.dart';
+import 'package:min_gram/main.dart';
+import 'package:min_gram/services/telegram_service.dart';
+import 'package:tdlib/src/tdapi/tdapi.dart';
 
-
-import '../model/user/result.dart';
-import '../screens/detail_screens.dart';
-import '../sqlite/data.dart';
-import 'getUpdates.dart';
+import '../database/table.dart';
 
 const notificationChannelId = 'my_foreground';
 
@@ -54,12 +56,12 @@ Future<void> initializeService() async {
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) {
-  bool is_noti = false;
+  bool is_noti = true;
   String? text = "";
   String? userName = "";
   String userId = "";
-
-  DartPluginRegistrant.ensureInitialized();
+  print("onstart ok");
+  // DartPluginRegistrant.ensureInitialized();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -77,40 +79,55 @@ void onStart(ServiceInstance service) {
   });
   int x = 0;
   Timer.periodic(Duration(seconds: 1), (timer) async {
+    print("test timer ");
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
-        print("ok noti");
-        final results = await ApiService.fetchResults();
-        final database = await DatabaseHelper.instance.database;
-        for (int i = 0; i < results.length; i++) {
-          final message = results[i].message;
-          if (message != null) {
-            final messageRow = {
-              'id': message.messageId,
-              'user_id': message.from?.id,
-              'text': message.text,
-              'date_time': message.date,
-              'is_sent': 1,
-            };
+        print("test fore ");
+        final contacts = await getContacts();
 
-            try {
-              // Chuyển phần thao tác cập nhật vào một luồng khác
-              await Future.delayed(Duration.zero, () async {
-                final messageId = await database.insert('message', messageRow);
-                print('Message with ID ${message.text} aved successfully.');
-                // service.setForegroundNotificationInfo(title: "1", content: "2");
-                // sendNotificationFromLastData();
-                is_noti = true;
-                text = message.text;
-                userName =
-                    " ${message.from?.firstName} ${message.from?.lastName ?? ""}";
-                userId = "${message.from?.id}";
-              });
-            } catch (e) {
-              print('Failed to save message: $e');
+        // saveUserToDatabase(contacts.cast<Contact>());
+        for (int i = 0; i < contacts.length; i++) {
+          final lastMessages =
+              await getChatHistory(mainContext as BuildContext, contacts[i]);
+          final database = await DatabaseHelper.instance.database;
+          print("test mes ${lastMessages.length}");
+          int x = 0;
+
+          for (int i = 0; i < lastMessages.length; i++) {
+            x = x + 1;
+            print("test mes ${x} ${jsonEncode(lastMessages[i])}");
+            final message = lastMessages[i];
+
+            String messageTxt = "";
+            if (message.content is MessageText) {
+              MessageText messageText = message.content as MessageText;
+              FormattedText text = messageText.text;
+              messageTxt = text.text;
+            }
+            if (message != null) {
+              final messageRow = {
+                'id': message.chatId,
+                'user_id': message.id,
+                'text': messageTxt,
+                'date_time': message.date,
+                'is_sent': 1,
+              };
+
+              try {
+                // Chuyển phần thao tác cập nhật vào một luồng khác
+                await Future.delayed(Duration.zero, () async {
+                  final messageId =
+                      await database.insert('message', messageRow);
+                  print('Message with ID $messageId saved successfully.');
+                  text = messageTxt;
+                });
+              } catch (e) {
+                print('Failed to save message: $e');
+              }
             }
           }
         }
+        print("ok noti");
       }
       if (is_noti) {
         flutterLocalNotificationsPlugin.show(
@@ -135,4 +152,18 @@ void onStart(ServiceInstance service) {
     print("background service running");
     service.invoke('update');
   });
+}
+
+Future<List<int>> getContacts() async {
+  print("test contact }");
+  final telegramService = TelegramService();
+  const searchQuery = GetContacts();
+  final result = await telegramService.send(searchQuery);
+  if (result is Users) {
+    final user = result.userIds;
+    return user;
+  } else {
+    print("Khong lay duoc contact");
+    return [];
+  }
 }

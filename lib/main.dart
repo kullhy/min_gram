@@ -1,6 +1,7 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:min_gram/services/noti_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:tdlib/td_client.dart';
@@ -10,7 +11,12 @@ import 'services/locator.dart';
 import 'services/telegram_service.dart';
 import 'utils/const.dart';
 
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+BuildContext? appContext = navigatorKey.currentContext;
+BuildContext? mainContext;
 void main() async {
+ 
    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   flutterLocalNotificationsPlugin
@@ -22,7 +28,9 @@ void main() async {
     (value) {
       Permission.notification.request();
     },
+    
   );
+   await initializeService();
   //SystemChrome.setSystemUIOverlayStyle(SystemUiOverlay.);
   WidgetsFlutterBinding.ensureInitialized();
   Provider.debugCheckInvalidValueType = null;
@@ -36,7 +44,7 @@ void main() async {
           lazy: false,
         ),
       ],
-      child: const MyApp(),
+      child: AppContextProvider( child: MyApp(),) ,
     ),
   );
 }
@@ -51,6 +59,20 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark(),
       onGenerateRoute: utilrouter.Router.generateRoute,
       initialRoute: initRoute,
+    );
+  }
+}
+
+class AppContextProvider extends StatelessWidget {
+  final Widget child;
+
+  const AppContextProvider({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Provider<BuildContext>.value(
+      value: context,
+      child: child,
     );
   }
 }
