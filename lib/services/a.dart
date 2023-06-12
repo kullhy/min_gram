@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math' show Random;
@@ -20,8 +19,7 @@ class TelegramService extends ChangeNotifier {
   late int _client;
   late StreamController<TdObject> _eventController;
   late StreamSubscription<TdObject> _eventReceiver;
-  StreamController<Update> _updateController =
-      StreamController<Update>.broadcast();
+   StreamController<Update> _updateController = StreamController<Update>.broadcast();
   Stream<Update> get updateStream => _updateController.stream;
   Map results = <int, Completer>{};
   Map callbackResults = <int, Future<void>>{};
@@ -31,7 +29,6 @@ class TelegramService extends ChangeNotifier {
 
   final ReceivePort _receivePort = ReceivePort();
   late Isolate _isolate;
-  bool _isClientInitialized = false;
 
   TelegramService({this.lastRouteName = initRoute}) {
     _eventController = StreamController();
@@ -41,7 +38,6 @@ class TelegramService extends ChangeNotifier {
 
   void initClient() async {
     _client = tdCreate();
-    _isClientInitialized = true;
 
     // ignore: unused_local_variable
     bool storagePermission = await Permission.storage
@@ -229,64 +225,20 @@ class TelegramService extends ChangeNotifier {
   /// Returned pointer will be deallocated by TDLib during next call to clientReceive or clientExecute in the same thread, so it can't be used after that.
   TdObject execute(TdFunction event) => tdExecute(event)!;
 
-  Future setAuthenticationPhoneNumber(
-    String phoneNumber, {
-    required void Function(TdError) onError,
-  }) async {
-    final result = await send(
-      SetAuthenticationPhoneNumber(
-        phoneNumber: phoneNumber,
-        settings: const PhoneNumberAuthenticationSettings(
-          allowFlashCall: false,
-          isCurrentPhoneNumber: false,
-          allowSmsRetrieverApi: false,
-          allowMissedCall: true,
-          authenticationTokens: [],
-        ),
-      ),
-    );
-    if (result != null && result is TdError) {
-      onError(result);
-    }
+  
+
+Future<List<int>> getContacts() async {
+  final searchQuery = GetContacts();
+  final result = await send(searchQuery);
+
+  if (result is Users) {
+    return result.userIds;
+  } else {
+    print("Không lấy được danh sách liên hệ");
+    return [];
   }
+}
 
 
-  Future<List<int>> getContacts() async {
-    if (!_isClientInitialized) {
-      initClient();
-    }
-    print("call on service");
-    final result = await send(GetContacts());
-    final completer = Completer<List<int>>();
-    if (result != null && result is Users) {
-      completer.complete(result.userIds);
-    } else {
-      print("Không lấy được danh sách liên hệ");
-      completer.complete([]);
-    }
-    return completer.future;
-  }
 
-//   void startListeningMessages(int userId) {
-//   _messageController = StreamController<Message>();
-//   _eventController.stream.listen((event) {
-//     if (event is Message) {
-//       _messageController.add(event);
-//     }
-//   });
-// }
-
-  Future checkAuthenticationCode(
-    String code, {
-    required void Function(TdError) onError,
-  }) async {
-    final result = await send(
-      CheckAuthenticationCode(
-        code: code,
-      ),
-    );
-    if (result != null && result is TdError) {
-      onError(result);
-    }
-  }
 }

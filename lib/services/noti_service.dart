@@ -56,6 +56,7 @@ Future<void> initializeService() async {
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) {
+  // final telegramService = TelegramService();
   bool is_noti = true;
   String? text = "";
   String? userName = "";
@@ -82,51 +83,51 @@ void onStart(ServiceInstance service) {
     print("test timer ");
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
-        print("test fore ");
-        final contacts = await getContacts();
+        print("test fore ${navigatorKey.currentContext!}");
+
+        final contacts = getContacts(navigatorKey.currentContext!);
 
         // saveUserToDatabase(contacts.cast<Contact>());
-        for (int i = 0; i < contacts.length; i++) {
-          final lastMessages =
-              await getChatHistory(mainContext as BuildContext, contacts[i]);
-          final database = await DatabaseHelper.instance.database;
-          print("test mes ${lastMessages.length}");
-          int x = 0;
+        // for (int i = 0; i < contacts.length; i++) {
+        //   final lastMessages = await getChatHistory(mainContext!, contacts[i]);
+        //   final database = await DatabaseHelper.instance.database;
+        //   print("test mes ${lastMessages.length}");
+        //   int x = 0;
 
-          for (int i = 0; i < lastMessages.length; i++) {
-            x = x + 1;
-            print("test mes ${x} ${jsonEncode(lastMessages[i])}");
-            final message = lastMessages[i];
+        //   for (int i = 0; i < lastMessages.length; i++) {
+        //     x = x + 1;
+        //     print("test mes ${x} ${jsonEncode(lastMessages[i])}");
+        //     final message = lastMessages[i];
 
-            String messageTxt = "";
-            if (message.content is MessageText) {
-              MessageText messageText = message.content as MessageText;
-              FormattedText text = messageText.text;
-              messageTxt = text.text;
-            }
-            if (message != null) {
-              final messageRow = {
-                'id': message.chatId,
-                'user_id': message.id,
-                'text': messageTxt,
-                'date_time': message.date,
-                'is_sent': 1,
-              };
+        //     String messageTxt = "";
+        //     if (message.content is MessageText) {
+        //       MessageText messageText = message.content as MessageText;
+        //       FormattedText text = messageText.text;
+        //       messageTxt = text.text;
+        //     }
+        //     if (message != null) {
+        //       final messageRow = {
+        //         'id': message.chatId,
+        //         'user_id': message.id,
+        //         'text': messageTxt,
+        //         'date_time': message.date,
+        //         'is_sent': 1,
+        //       };
 
-              try {
-                // Chuyển phần thao tác cập nhật vào một luồng khác
-                await Future.delayed(Duration.zero, () async {
-                  final messageId =
-                      await database.insert('message', messageRow);
-                  print('Message with ID $messageId saved successfully.');
-                  text = messageTxt;
-                });
-              } catch (e) {
-                print('Failed to save message: $e');
-              }
-            }
-          }
-        }
+        //       try {
+        //         // Chuyển phần thao tác cập nhật vào một luồng khác
+        //         await Future.delayed(Duration.zero, () async {
+        //           final messageId =
+        //               await database.insert('message', messageRow);
+        //           print('Message with ID $messageId saved successfully.');
+        //           text = messageTxt;
+        //         });
+        //       } catch (e) {
+        //         print('Failed to save message: $e');
+        //       }
+        //     }
+        //   }
+        // }
         print("ok noti");
       }
       if (is_noti) {
@@ -152,18 +153,4 @@ void onStart(ServiceInstance service) {
     print("background service running");
     service.invoke('update');
   });
-}
-
-Future<List<int>> getContacts() async {
-  print("test contact }");
-  final telegramService = TelegramService();
-  const searchQuery = GetContacts();
-  final result = await telegramService.send(searchQuery);
-  if (result is Users) {
-    final user = result.userIds;
-    return user;
-  } else {
-    print("Khong lay duoc contact");
-    return [];
-  }
 }

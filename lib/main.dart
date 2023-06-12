@@ -11,13 +11,11 @@ import 'services/locator.dart';
 import 'services/telegram_service.dart';
 import 'utils/const.dart';
 
-
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 BuildContext? appContext = navigatorKey.currentContext;
 BuildContext? mainContext;
 void main() async {
- 
-   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
@@ -28,9 +26,8 @@ void main() async {
     (value) {
       Permission.notification.request();
     },
-    
   );
-   await initializeService();
+  await initializeService();
   //SystemChrome.setSystemUIOverlayStyle(SystemUiOverlay.);
   WidgetsFlutterBinding.ensureInitialized();
   Provider.debugCheckInvalidValueType = null;
@@ -44,17 +41,19 @@ void main() async {
           lazy: false,
         ),
       ],
-      child: AppContextProvider( child: MyApp(),) ,
+        child: MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}): super(key: key);
+  const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    mainContext = context;
     return MaterialApp(
       navigatorKey: locator<NavigationService>().navigatorKey,
+      
       title: 'Flutter Demo',
       theme: ThemeData.dark(),
       onGenerateRoute: utilrouter.Router.generateRoute,
@@ -63,16 +62,3 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AppContextProvider extends StatelessWidget {
-  final Widget child;
-
-  const AppContextProvider({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Provider<BuildContext>.value(
-      value: context,
-      child: child,
-    );
-  }
-}

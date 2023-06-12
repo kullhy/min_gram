@@ -48,9 +48,9 @@ class _HomeScreensState extends State<HomeScreens> {
     // TODO: implement initState
     super.initState();
     listContact();
-    FlutterBackgroundService().invoke('setAsForeground');
-    mainContext = context;
 
+    mainContext = context;
+    FlutterBackgroundService().invoke('setAsForeground');
     FlutterLocalNotificationsPlugin()
         .getNotificationAppLaunchDetails()
         .then((notificationAppLaunchDetails) {
