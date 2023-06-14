@@ -41,7 +41,7 @@ void main() async {
           lazy: false,
         ),
       ],
-        child: MyApp(),
+      child: MyApp(),
     ),
   );
 }
@@ -53,7 +53,6 @@ class MyApp extends StatelessWidget {
     mainContext = context;
     return MaterialApp(
       navigatorKey: locator<NavigationService>().navigatorKey,
-      
       title: 'Flutter Demo',
       theme: ThemeData.dark(),
       onGenerateRoute: utilrouter.Router.generateRoute,
@@ -61,4 +60,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

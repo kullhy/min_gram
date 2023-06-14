@@ -110,12 +110,12 @@ class _ChatScreensState extends State<ChatScreens> {
         ),
       );
       await telegramService.send(sendMessage);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Message sent successfully'),
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: const Text('Message sent successfully'),
       ));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('User not found'),
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: const Text('User not found'),
       ));
     }
   }
@@ -135,7 +135,7 @@ class _ChatScreensState extends State<ChatScreens> {
                   .stream, // Sử dụng stream từ StreamController
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
@@ -173,7 +173,7 @@ class _ChatScreensState extends State<ChatScreens> {
                             child: Container(
                               margin: const EdgeInsets.symmetric(
                                   vertical: 8, horizontal: 16),
-                              padding: EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: isOutgoing ? Colors.blue : Colors.grey,
                                 borderRadius: BorderRadius.circular(8),
@@ -196,7 +196,7 @@ class _ChatScreensState extends State<ChatScreens> {
                 Expanded(
                   child: TextField(
                     controller: textEditingController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Message',
                     ),
                   ),
@@ -207,7 +207,7 @@ class _ChatScreensState extends State<ChatScreens> {
                     sendMessage(context, message, widget.chatId);
                     textEditingController.clear();
                   },
-                  child: Text('Send'),
+                  child: const Text('Send'),
                 ),
               ],
             ),

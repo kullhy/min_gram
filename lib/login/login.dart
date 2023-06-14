@@ -140,13 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
               : value,
           onError: _handelError,
         );
-    // print(
-    //     "test phone code ${context.read<TelegramService>().setAuthenticationPhoneNumber(
-    //           (_selectedCountry != null)
-    //               ? '+${_selectedCountry!.phoneCode}$value'
-    //               : value,
-    //           onError: _handelError,
-    //         )}");
+
   }
 
   void _handelError(TdError error) async {

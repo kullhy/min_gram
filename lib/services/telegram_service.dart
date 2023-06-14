@@ -15,6 +15,7 @@ import './locator.dart';
 import '../utils/const.dart';
 
 int _random() => Random().nextInt(10000000);
+late AuthorizationState tdState;
 
 class TelegramService extends ChangeNotifier {
   late int _client;
@@ -47,14 +48,7 @@ class TelegramService extends ChangeNotifier {
     bool storagePermission = await Permission.storage
         .request()
         .isGranted; // todo : handel storage permission
-    /*try {
-      PermissionStatus storagePermission =
-          await SimplePermissions.requestPermission(
-              Permission.WriteExternalStorage);
-    } on PlatformException catch (e) {
-      print(e);
-    }
-    */
+
     appDocDir = await getApplicationDocumentsDirectory();
     appExtDir = await getTemporaryDirectory();
 
@@ -113,13 +107,9 @@ class TelegramService extends ChangeNotifier {
   }
 
   void _onEvent(TdObject event) async {
-    /*try {
-      print('res =>>>> ${event.toJson()}');
-    } catch (NoSuchMethodError) {
-      print('res =>>>> ${event.getConstructor()}');
-    }*/
     switch (event.getConstructor()) {
       case UpdateAuthorizationState.CONSTRUCTOR:
+        tdState = (event as UpdateAuthorizationState).authorizationState;
         await _authorizationController(
           (event as UpdateAuthorizationState).authorizationState,
           isOffline: true,
@@ -135,6 +125,7 @@ class TelegramService extends ChangeNotifier {
     bool isOffline = false,
   }) async {
     String route;
+    print("Trạng thái đầu $tdState");
     switch (authState.getConstructor()) {
       case AuthorizationStateWaitTdlibParameters.CONSTRUCTOR:
         await send(
@@ -185,6 +176,8 @@ class TelegramService extends ChangeNotifier {
         route = otpRoute;
         break;
       case AuthorizationStateWaitOtherDeviceConfirmation.CONSTRUCTOR:
+        route = qrRoute;
+        break;
       case AuthorizationStateWaitRegistration.CONSTRUCTOR:
       case AuthorizationStateWaitPassword.CONSTRUCTOR:
       case AuthorizationStateLoggingOut.CONSTRUCTOR:
@@ -250,7 +243,6 @@ class TelegramService extends ChangeNotifier {
     }
   }
 
-
   Future<List<int>> getContacts() async {
     if (!_isClientInitialized) {
       initClient();
@@ -275,6 +267,19 @@ class TelegramService extends ChangeNotifier {
 //     }
 //   });
 // }
+  bool isClientInitialized() {
+    return _isClientInitialized;
+  }
+
+  Future requestQR({
+    required void Function(TdError) onError,
+  }) async {
+    AuthorizationState authState = AuthorizationState();
+    print("Trạng thái rqqr $authState");
+
+    await send(
+        RequestQrCodeAuthentication(otherUserIds: []));
+  }
 
   Future checkAuthenticationCode(
     String code, {

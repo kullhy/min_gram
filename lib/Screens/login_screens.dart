@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:country_pickers/country.dart';
 import 'package:country_pickers/country_pickers.dart';
 
-import 'package:tdlib/td_api.dart' show TdError;
+import 'package:tdlib/td_api.dart' hide Text;
 
 import '../services/telegram_service.dart';
 
@@ -112,7 +114,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       : '',
                   style: const TextStyle(color: Colors.grey, fontSize: 15.0),
                 ),
-              )
+              ),
+              TextButton(
+                  onPressed: () {
+                    context.read<TelegramService>().requestQR(onError: _handelError);
+                  },
+                  child: const Text("send"))
             ],
           )
         ],
@@ -184,4 +191,42 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Text(country.name),
         )
       ]);
+
+  void sendMessagex(BuildContext context) async {
+    String message = "x";
+    int chatId = 6005052616;
+    final telegramService =
+        Provider.of<TelegramService>(context, listen: false);
+
+    final createPrivateChatResult =
+        CreatePrivateChat(userId: chatId, force: false);
+    final createChat = await telegramService.send(createPrivateChatResult);
+    print("create new chat ${jsonEncode(createChat)}");
+    if (10507 != null) {
+      print("new chat");
+      final sendMessage = SendMessage(
+        chatId: chatId,
+        messageThreadId: 0,
+        replyToMessageId: 0,
+        options: null,
+        replyMarkup: null,
+        inputMessageContent: InputMessageText(
+          text: FormattedText(
+            entities: [],
+            text: message,
+          ),
+          clearDraft: false,
+          disableWebPagePreview: false,
+        ),
+      );
+      final newchat = telegramService.send(sendMessage);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Message sent ${jsonEncode(newchat)}"),
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('User not found'),
+      ));
+    }
+  }
 }

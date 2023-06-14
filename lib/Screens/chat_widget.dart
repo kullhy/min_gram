@@ -24,41 +24,41 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Send Message'),
+        title: const Text('Send Message'),
       ),
       body: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               'To: ${widget.phoneNumber}',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               onChanged: (value) {
                 setState(() {
                   message = value;
                 });
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Message',
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 sendMessage(context);
               },
-              child: Text('Send'),
+              child: const Text('Send'),
             ),
             ElevatedButton(
               onPressed: () async {
                 Hmessages = await getChatHistory(context);
                 print("test history ${jsonEncode(Hmessages)}");
               },
-              child: Text('history chat'),
+              child: const Text('history chat'),
             ),
             //  Expanded(
             //     child: ListView.builder(
@@ -88,7 +88,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
     //     await telegramService.searchUserByPhoneNumber(widget.phoneNumber);
     // print("user ID : $userId");
 
-    final getChatHistory = GetChatHistory(
+    final getChatHistory = const GetChatHistory(
       chatId: 6252774475,
       fromMessageId: 0,
       offset: 0,
@@ -129,12 +129,12 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
       );
       await telegramService.send(sendMessage);
       print("object ${jsonEncode(telegramService.send(sendMessage))}");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Message sent successfully'),
       ));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('User not found'),
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: const Text('User not found'),
       ));
     }
   }

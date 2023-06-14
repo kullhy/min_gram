@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
+import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -57,6 +58,7 @@ Future<void> initializeService() async {
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) {
   // final telegramService = TelegramService();
+
   bool is_noti = true;
   String? text = "";
   String? userName = "";
@@ -79,7 +81,7 @@ void onStart(ServiceInstance service) {
     service.stopSelf();
   });
   int x = 0;
-  Timer.periodic(Duration(seconds: 1), (timer) async {
+  Timer.periodic(Duration(seconds: 888888), (timer) async {
     print("test timer ");
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
